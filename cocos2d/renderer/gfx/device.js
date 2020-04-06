@@ -536,7 +536,7 @@ function _commitTextures(gl, cur, next) {
 /**
  * _attach
  */
-function _attach(gl, location, attachment, face = 0) {
+function _attach(gl, location, attachment, face = 0, depth = 0) {
   if (attachment instanceof Texture2D) {
     gl.framebufferTexture2D(
       gl.FRAMEBUFFER,
@@ -553,6 +553,14 @@ function _attach(gl, location, attachment, face = 0) {
       attachment._glID,
       0
     );
+  } else if (depth == 1) {
+    // gameknife hack, samplable depth texture
+    gl.framebufferTexture2D(
+      gl.FRAMEBUFFER, 
+      gl.DEPTH_ATTACHMENT, 
+      gl.TEXTURE_2D, 
+      attachment._glID,
+      0);
   } else {
     gl.framebufferRenderbuffer(
       gl.FRAMEBUFFER,
@@ -826,6 +834,12 @@ export default class Device {
 
     if (fb._depthStencil) {
       _attach(gl, gl.DEPTH_STENCIL_ATTACHMENT, fb._depthStencil);
+    }
+
+    // gameknife hack, samplable depth texture
+    if(fb._depthTexture)
+    {
+      _attach(gl, gl.DEPTH_ATTACHMENT, fb._depthTexture, 0, 1);
     }
   }
 

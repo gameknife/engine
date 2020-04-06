@@ -20,6 +20,9 @@ export default class FrameBuffer {
     this._stencil = options.stencil || null;
     this._depthStencil = options.depthStencil || null;
 
+    // gameknife hack: samplable depth texture
+    this._depthTexture = options.depthTexture || null;
+
     this._glID = device._gl.createFramebuffer();
   }
 
