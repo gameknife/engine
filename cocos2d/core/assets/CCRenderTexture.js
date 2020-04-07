@@ -40,67 +40,50 @@ let RenderTexture = cc.Class({
         if (this._depthStencilBuffer) this._depthStencilBuffer.destroy();
         let depthStencilBuffer;
         if (depthStencilFormat) {
-            depthStencilBuffer = new gfx.RenderBuffer(renderer.device, depthStencilFormat, width, height);
-            if (depthStencilFormat === gfx.RB_FMT_D24S8) {
-                opts.depthStencil = depthStencilBuffer;
+
+            const gl = renderer.device._gl;
+            const ext = gl.getExtension('WEBGL_depth_texture');
+
+            if(ext !== undefined)
+            {
+                // destroy the prev texture
+                if(this._depthTexture)
+                {
+                    this._depthTexture.destroy();
+                }
+
+                this._depthTexture = new cc.RenderTexture();
+                this._depthTexture.initWithSize(width,height);
+                
+                const fTexture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, fTexture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+                // hack into
+                gl.deleteTexture(this._depthTexture._texture._glID);
+                this._depthTexture._texture._glID = fTexture;
+                
+                // setup
+                opts.depthTexture = this._depthTexture;
             }
-            else if (depthStencilFormat === gfx.RB_FMT_S8) {
-                opts.stencil = depthStencilBuffer;
-            }
-            else if (depthStencilFormat === gfx.RB_FMT_D16) {
-                opts.depth = depthStencilBuffer;
+            else
+            {
+                depthStencilBuffer = new gfx.RenderBuffer(renderer.device, depthStencilFormat, width, height);
+                if (depthStencilFormat === gfx.RB_FMT_D24S8) {
+                    opts.depthStencil = depthStencilBuffer;
+                }
+                else if (depthStencilFormat === gfx.RB_FMT_S8) {
+                    opts.stencil = depthStencilBuffer;
+                }
+                else if (depthStencilFormat === gfx.RB_FMT_D16) {
+                    opts.depth = depthStencilBuffer;
+                }
             }
         }
-        this._depthStencilBuffer = depthStencilBuffer;
-        if (this._framebuffer) this._framebuffer.destroy();
-        this._framebuffer = new gfx.FrameBuffer(renderer.device, width, height, opts);
-
-        this._packable = false;
-        
-        this.loaded = true;
-        this.emit("load");
-    },
-
-    initWithSizeDepth (width, height, depthStencilFormat) {
-        this.width = Math.floor(width || cc.visibleRect.width);
-        this.height = Math.floor(height || cc.visibleRect.height);
-        this._resetUnderlyingMipmaps();
-        
-        // hacking a gl depth texture here, from zero
-        let gl = renderer.device._gl;
-
-        const fTexture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, fTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.DEPTH_COMPONENT, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-
-        this._depthTexture = {
-            _glID: fTexture,
-        }
-
-        let opts = {
-            colors: [ this._texture ],
-            depthTexture: this._depthTexture,
-        };
-
-        if (this._depthStencilBuffer) this._depthStencilBuffer.destroy();
-        let depthStencilBuffer;
-        // if (depthStencilFormat) {
-        //     depthStencilBuffer = new gfx.RenderBuffer(renderer.device, depthStencilFormat, width, height);
-        //     if (depthStencilFormat === gfx.RB_FMT_D24S8) {
-        //         opts.depthStencil = depthStencilBuffer;
-        //     }
-        //     else if (depthStencilFormat === gfx.RB_FMT_S8) {
-        //         opts.stencil = depthStencilBuffer;
-        //     }
-        //     else if (depthStencilFormat === gfx.RB_FMT_D16) {
-        //         opts.depth = depthStencilBuffer;
-        //     }
-        // }
         this._depthStencilBuffer = depthStencilBuffer;
         if (this._framebuffer) this._framebuffer.destroy();
         this._framebuffer = new gfx.FrameBuffer(renderer.device, width, height, opts);

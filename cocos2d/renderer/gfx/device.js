@@ -839,7 +839,7 @@ export default class Device {
     // gameknife hack, samplable depth texture
     if(fb._depthTexture)
     {
-      _attach(gl, gl.DEPTH_ATTACHMENT, fb._depthTexture, 0, 1);
+      _attach(gl, gl.DEPTH_ATTACHMENT, fb._depthTexture._texture, 0, 1);
     }
   }
 
