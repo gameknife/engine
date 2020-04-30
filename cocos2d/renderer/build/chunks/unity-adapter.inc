@@ -21,9 +21,9 @@
   #define _Time cc_time
 
   //x is 1.0 (or –1.0 if currently rendering with a flipped projection matrix), y is the camera’s near plane, z is the camera’s far plane and w is 1/FarPlane.
-  const float4 _ProjectionParams = float4(1.0, 20.0, 60.0, 0.0166667);
+  const float4 _ProjectionParams = float4(1.0, 20.0, 100.0, 0.0166667);
   //Used to linearize Z buffer values. x is (1-far/near), y is (far/near), z is (x/far) and w is (y/far).
-  const float4 _ZBufferParams = float4(-2.0, 3.0, -0.033333, 0.05);
+  const float4 _ZBufferParams = float4(-4.0, 5.0, -0.04, 0.05);
 
   vec3 pow3(vec3 d, float p)
   {

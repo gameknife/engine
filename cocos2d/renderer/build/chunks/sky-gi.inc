@@ -11,7 +11,7 @@ vec3 calcSkyLight( vec3 worldpos, vec3 normal )
   uv.y = 1.0 - uv.y;
 
   vec3 skycolor = texture2D(skyTexture, uv).rgb;
-  skycolor = mix(skycolor, skyGIColor.rgb, min(worldpos.y * 0.25, 1.0));
+  skycolor = mix(skycolor, skyGIColor.rgb, min(worldpos.y * skyGIParam.z, 1.0));
 
   // 再根据normaly混合一个顶底明暗
   float topdownsky = normal.y * 0.5 + 0.5;
