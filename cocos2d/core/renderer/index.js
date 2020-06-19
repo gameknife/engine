@@ -98,6 +98,7 @@ export default cc.renderer = {
      * @type {Number}
      */
     drawCalls: 0,
+    uniforms: 0,
     // Render component handler
     _handle: null,
     _cameraNode: null,
@@ -178,6 +179,7 @@ export default cc.renderer = {
             // walk entity component scene to generate models
             this._flow.render(ecScene, dt);
             this.drawCalls = this.device.getDrawCalls();
+            this.uniforms = this.device.getUniforms();
         }
     },
 

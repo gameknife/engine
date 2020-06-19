@@ -1156,6 +1156,13 @@ cc.Director.EVENT_BEFORE_DRAW = "director_before_draw";
  */
 cc.Director.EVENT_AFTER_DRAW = "director_after_draw";
 
+
+cc.Director.EVENT_BEFORE_BATCHER = "director_before_batcher";
+cc.Director.EVENT_AFTER_BATCHER = "director_after_batcher";
+
+cc.Director.EVENT_RENDERPIPE_PREPARE = "EVENT_RENDERPIPE_PREPARE";
+cc.Director.EVENT_RENDERPIPE_VIEW = "EVENT_RENDERPIPE_VIEW";
+cc.Director.EVENT_RENDERPIPE_END = "EVENT_RENDERPIPE_END";
 //Possible OpenGL projections used by director
 
 /**

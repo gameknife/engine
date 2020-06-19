@@ -42,8 +42,12 @@ function generateStats () {
         frame: { desc: 'Frame time (ms)', min: 0, max: 50, average: 500 },
         fps: { desc: 'Framerate (FPS)', below: 30, average: 500 },
         draws: { desc: 'Draw call' },
+        uniforms: { desc: 'Uniform' },
         logic: { desc: 'Game Logic (ms)', min: 0, max: 50, average: 500, color: '#080' },
         render: { desc: 'Renderer (ms)', min: 0, max: 50, average: 500, color: '#f90' },
+        batcher: { desc: 'Batcher (ms)', min: 0, max: 50, average: 500, color: '#f90' },
+        viewprepare: { desc: 'PrepareView (ms)', min: 0, max: 50, average: 500, color: '#f90' },
+        viewrender: { desc: 'RenderView (ms)', min: 0, max: 50, average: 500, color: '#f90' },
         mode: { desc: cc.game.renderType === cc.game.RENDER_TYPE_WEBGL ? 'WebGL' : 'Canvas', min: 1 }
     };
 
@@ -124,6 +128,7 @@ function afterDraw () {
     let now = performance.now();
     _stats['render']._counter.end(now);
     _stats['draws']._counter.value = cc.renderer.drawCalls;
+    _stats['uniforms']._counter.value = cc.renderer.uniforms;
     _stats['frame']._counter.end(now);
     _stats['fps']._counter.frame(now);
     
@@ -143,6 +148,30 @@ function afterDraw () {
     }
 }
 
+function beforeBatch () {
+    let now = performance.now();
+    _stats['batcher']._counter.start(now);
+}
+
+function afterBatch () {
+    let now = performance.now();
+    _stats['batcher']._counter.end(now);
+}
+
+function pipePrepare () {
+    let now = performance.now();
+    _stats['viewprepare']._counter.start(now);
+}
+function pipeView () {
+    let now = performance.now();
+    _stats['viewprepare']._counter.end(now);
+    _stats['viewrender']._counter.start(now);
+}
+function pipeEnd () {
+    let now = performance.now();
+    _stats['viewrender']._counter.end(now);
+}
+
 cc.profiler = module.exports = {
     isShowingStats () {
         return _showFPS;
@@ -157,6 +186,13 @@ cc.profiler = module.exports = {
             cc.director.off(cc.Director.EVENT_BEFORE_UPDATE, beforeUpdate);
             cc.director.off(cc.Director.EVENT_AFTER_UPDATE, afterUpdate);
             cc.director.off(cc.Director.EVENT_AFTER_DRAW, afterDraw);
+            cc.director.off(cc.Director.EVENT_BEFORE_BATCHER, beforeBatch);
+            cc.director.off(cc.Director.EVENT_AFTER_BATCHER, afterBatch);
+
+            cc.director.off(cc.Director.EVENT_RENDERPIPE_PREPARE,   pipePrepare);
+            cc.director.off(cc.Director.EVENT_RENDERPIPE_VIEW,      pipeView);
+            cc.director.off(cc.Director.EVENT_RENDERPIPE_END,       pipeEnd);
+
             _showFPS = false;
         }
     },
@@ -172,6 +208,14 @@ cc.profiler = module.exports = {
             cc.director.on(cc.Director.EVENT_BEFORE_UPDATE, beforeUpdate);
             cc.director.on(cc.Director.EVENT_AFTER_UPDATE, afterUpdate);
             cc.director.on(cc.Director.EVENT_AFTER_DRAW, afterDraw);
+
+            cc.director.on(cc.Director.EVENT_BEFORE_BATCHER, beforeBatch);
+            cc.director.on(cc.Director.EVENT_AFTER_BATCHER, afterBatch);
+
+            cc.director.on(cc.Director.EVENT_RENDERPIPE_PREPARE, pipePrepare);
+            cc.director.on(cc.Director.EVENT_RENDERPIPE_VIEW, pipeView);
+            cc.director.on(cc.Director.EVENT_RENDERPIPE_END, pipeEnd);
+
             _showFPS = true;
         }
     }

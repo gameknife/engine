@@ -633,6 +633,7 @@ export default class Device {
       vb: 0,
       ib: 0,
       drawcalls: 0,
+      uniforms: 0,
     };
 
     // https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL_API/Using_Extensions
@@ -1297,6 +1298,7 @@ export default class Device {
    */
   resetDrawCalls () {
     this._stats.drawcalls = 0;
+    this._stats.uniforms = 0;
   }
   
   /**
@@ -1304,6 +1306,10 @@ export default class Device {
    */
   getDrawCalls () {
     return this._stats.drawcalls;
+  }
+
+  getUniforms () {
+    return this._stats.uniforms;
   }
 
   /**
@@ -1374,6 +1380,7 @@ export default class Device {
       }
 
       commitFunc(gl, uniformInfo.location, uniform.value);
+      this._stats.uniforms++;
     }
 
     if (count) {

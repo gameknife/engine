@@ -53,6 +53,9 @@ export default class ForwardRenderer extends BaseRenderer {
   }
 
   render (scene, dt) {
+
+    cc.director.emit(cc.Director.EVENT_RENDERPIPE_PREPARE);
+
     this.reset();
 
     if (!CC_EDITOR) {
@@ -76,10 +79,14 @@ export default class ForwardRenderer extends BaseRenderer {
       return (a._priority - b._priority);
     });
 
+    cc.director.emit(cc.Director.EVENT_RENDERPIPE_VIEW);
+
     for (let i = 0; i < this._viewPools.length; ++i) {
       let view = this._viewPools.data[i];
       this._render(view, scene);
     }
+
+    cc.director.emit(cc.Director.EVENT_RENDERPIPE_END);
   }
 
   // direct render a single camera

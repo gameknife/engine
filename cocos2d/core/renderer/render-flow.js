@@ -233,6 +233,11 @@ RenderFlow.visitRootNode = function (rootNode) {
 };
 
 RenderFlow.render = function (scene, dt) {
+    
+    // profile batch
+
+    cc.director.emit(cc.Director.EVENT_BEFORE_BATCHER);
+
     _batcher.reset();
     _batcher.walking = true;
 
@@ -241,7 +246,11 @@ RenderFlow.render = function (scene, dt) {
     _batcher.terminate();
     _batcher.walking = false;
 
+    // profile batchend
+    cc.director.emit(cc.Director.EVENT_AFTER_BATCHER);
+    // profile rendercmd
     _forward.render(_batcher._renderScene, dt);
+    // profile rendercmd end
 };
 
 RenderFlow.init = function (batcher, forwardRenderer) {
