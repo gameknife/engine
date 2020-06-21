@@ -30,6 +30,6 @@ vec4 finalComposite( vec3 skyColor, vec3 allLight, vec3 albedo, vec3 finalOutput
   #elif USE_DEBUG_VISUAL == 3
   return vec4(allLight,1.0);
   #else
-  return vec4(finalOutput,1.0);
+  return vec4(finalOutput*0.5,1.0);
   #endif
 }
