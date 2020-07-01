@@ -18,17 +18,17 @@ vec3 calcSkyLight( vec3 worldpos, vec3 normal )
   topdownsky = topdownsky * 0.25 + 0.75;
   skycolor *= topdownsky;
 
-  return skycolor;
+  return skycolor*2.0;
 }
 
 vec4 finalComposite( vec3 skyColor, vec3 allLight, vec3 albedo, vec3 finalOutput)
 {
   #if USE_DEBUG_VISUAL == 1
-  return vec4(albedo,1.0);
+  return vec4(albedo*0.5,1.0);
   #elif USE_DEBUG_VISUAL == 2 
-  return vec4(skyColor,1.0);
+  return vec4(skyColor*0.5,1.0);
   #elif USE_DEBUG_VISUAL == 3
-  return vec4(allLight,1.0);
+  return vec4(allLight*0.5,1.0);
   #else
   return vec4(finalOutput*0.5,1.0);
   #endif
